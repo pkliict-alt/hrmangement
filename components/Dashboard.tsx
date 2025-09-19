@@ -1,9 +1,8 @@
-
 import React, { useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Card } from './ui';
+import { Card, Button } from './ui';
 import { useLocalStorage } from '../hooks/useLocalStorage';
-import { Employee } from '../types';
+import { Employee, Page } from '../types';
 import { INITIAL_EMPLOYEES } from '../constants';
 
 // --- Reusable Components (defined outside main component) ---
@@ -49,8 +48,12 @@ const UpcomingEventsCard: React.FC<{ employees: Employee[] }> = ({ employees }) 
         const today = new Date();
         return employees
             .map(e => ({...e, anniversary: new Date(e.startDate)}))
-            .filter(e => e.anniversary.getMonth() === today.getMonth())
-            .sort((a, b) => a.anniversary.getDate() - b.anniversary.getDate())
+            .filter(e => {
+                const anniversary = new Date(e.startDate);
+                anniversary.setFullYear(today.getFullYear());
+                return anniversary >= today;
+            })
+            .sort((a, b) => a.anniversary.getTime() - b.anniversary.getTime())
             .slice(0, 5);
     }, [employees]);
 
@@ -69,15 +72,29 @@ const UpcomingEventsCard: React.FC<{ employees: Employee[] }> = ({ employees }) 
                         </li>
                     ))
                 ) : (
-                    <p className="text-sm text-gray-500">No upcoming anniversaries this month.</p>
+                    <p className="text-sm text-gray-500">No upcoming anniversaries.</p>
                 )}
             </ul>
         </Card>
     );
 };
 
+const QuickActionsCard: React.FC<{ setActivePage: (page: Page) => void }> = ({ setActivePage }) => (
+    <Card>
+        <h3 className="font-semibold text-lg text-gray-800 mb-4">Quick Actions</h3>
+        <div className="flex flex-col space-y-3">
+            <Button variant="secondary" onClick={() => setActivePage(Page.LMS)}>
+                Manage Courses
+            </Button>
+            <Button variant="secondary" onClick={() => setActivePage(Page.Recruitment)}>
+                Manage Candidates
+            </Button>
+        </div>
+    </Card>
+);
+
 // --- Main Dashboard Page Component ---
-const DashboardPage: React.FC = () => {
+const DashboardPage: React.FC<{ setActivePage: (page: Page) => void }> = ({ setActivePage }) => {
     const [employees] = useLocalStorage<Employee[]>('employees', INITIAL_EMPLOYEES);
 
     const departmentData = useMemo(() => {
@@ -112,8 +129,9 @@ const DashboardPage: React.FC = () => {
                 <div className="lg:col-span-2">
                     <DepartmentChart data={departmentData} />
                 </div>
-                <div>
+                <div className="space-y-6">
                     <UpcomingEventsCard employees={employees} />
+                    <QuickActionsCard setActivePage={setActivePage} />
                 </div>
             </div>
         </div>

@@ -1,8 +1,8 @@
-
 export enum Page {
   Dashboard = 'Dashboard',
   Employees = 'Employees',
   Recruitment = 'Recruitment',
+  LMS = 'LMS',
 }
 
 export interface Employee {
@@ -34,7 +34,17 @@ export interface Candidate {
   avatar: string;
 }
 
-// FIX: Add ChatMessage type to fix import errors in services/geminiService.ts and components/AiAssistant.tsx
+export interface Course {
+  id: string;
+  title: string;
+  description: string;
+  thumbnail: string;
+  duration: number; // in minutes
+  category: 'Technical' | 'Soft Skills' | 'Compliance' | 'Leadership';
+  enrolledCount: number;
+  totalCapacity: number;
+}
+
 export interface ChatMessage {
   role: 'user' | 'model';
   text: string;
