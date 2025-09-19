@@ -1,16 +1,13 @@
+
 import React, { useState } from 'react';
 import { Page } from './types';
 import { Icons } from './components/ui';
 import DashboardPage from './components/Dashboard';
-import EmployeesPage from './components/Employees';
 import RecruitmentPage from './components/Recruitment';
-import LMSPage from './components/LMS';
 
 const NAV_ITEMS: { page: Page; icon: JSX.Element }[] = [
   { page: Page.Dashboard, icon: Icons.dashboard },
-  { page: Page.Employees, icon: Icons.employees },
   { page: Page.Recruitment, icon: Icons.recruitment },
-  { page: Page.LMS, icon: Icons.lms },
 ];
 
 const Sidebar: React.FC<{ activePage: Page; setActivePage: (page: Page) => void }> = ({ activePage, setActivePage }) => {
@@ -65,15 +62,11 @@ const App: React.FC = () => {
   const renderPage = () => {
     switch (activePage) {
       case Page.Dashboard:
-        return <DashboardPage setActivePage={setActivePage} />;
-      case Page.Employees:
-        return <EmployeesPage />;
+        return <DashboardPage />;
       case Page.Recruitment:
         return <RecruitmentPage />;
-      case Page.LMS:
-        return <LMSPage />;
       default:
-        return <DashboardPage setActivePage={setActivePage} />;
+        return <DashboardPage />;
     }
   };
 
