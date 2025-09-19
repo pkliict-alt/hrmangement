@@ -140,15 +140,26 @@ const EmployeeTable: React.FC<{ employees: Employee[] }> = ({ employees }) => {
 const EmployeesPage: React.FC = () => {
     const [employees, setEmployees] = useLocalStorage<Employee[]>('employees', INITIAL_EMPLOYEES);
     const [searchTerm, setSearchTerm] = useState('');
+    const [departmentFilter, setDepartmentFilter] = useState('All');
+    const [statusFilter, setStatusFilter] = useState('All');
     const [isModalOpen, setIsModalOpen] = useState(false);
+    
+    const departmentOptions = ['All', 'Engineering', 'Marketing', 'Sales', 'HR', 'Design'];
+    const statusOptions = ['All', 'Active', 'On Leave', 'Terminated'];
 
     const filteredEmployees = useMemo(() => {
-        return employees.filter(employee =>
-            employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            employee.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            employee.position.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-    }, [employees, searchTerm]);
+        return employees.filter(employee => {
+            const matchesSearch =
+                employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                employee.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                employee.position.toLowerCase().includes(searchTerm.toLowerCase());
+            
+            const matchesDept = departmentFilter === 'All' || employee.department === departmentFilter;
+            const matchesStatus = statusFilter === 'All' || employee.status === statusFilter;
+
+            return matchesSearch && matchesDept && matchesStatus;
+        });
+    }, [employees, searchTerm, departmentFilter, statusFilter]);
     
     const handleAddEmployee = (newEmployeeData: Omit<Employee, 'id' | 'avatar'>) => {
         const newEmployee: Employee = {
@@ -163,14 +174,32 @@ const EmployeesPage: React.FC = () => {
         <div className="space-y-6">
             <Card>
                 <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                    <Input
-                        type="text"
-                        placeholder="Search for an employee..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full md:w-1/3"
-                    />
-                    <Button onClick={() => setIsModalOpen(true)}>
+                    <div className="flex flex-col sm:flex-row w-full md:w-auto gap-2 items-center">
+                        <Input
+                            type="text"
+                            placeholder="Search for an employee..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full sm:w-auto md:w-64"
+                        />
+                        <Select
+                            aria-label="Filter by department"
+                            value={departmentFilter}
+                            onChange={(e) => setDepartmentFilter(e.target.value)}
+                            className="w-full sm:w-auto"
+                        >
+                            {departmentOptions.map(dept => <option key={dept} value={dept}>{dept === 'All' ? 'All Departments' : dept}</option>)}
+                        </Select>
+                        <Select
+                            aria-label="Filter by status"
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
+                            className="w-full sm:w-auto"
+                        >
+                             {statusOptions.map(status => <option key={status} value={status}>{status === 'All' ? 'All Statuses' : status}</option>)}
+                        </Select>
+                    </div>
+                    <Button onClick={() => setIsModalOpen(true)} className="w-full sm:w-auto">
                         <span className="mr-2">{Icons.plus}</span> Add Employee
                     </Button>
                 </div>
