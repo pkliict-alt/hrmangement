@@ -3,7 +3,6 @@ export enum Page {
   Dashboard = 'Dashboard',
   Employees = 'Employees',
   Recruitment = 'Recruitment',
-  AiAssistant = 'AI Assistant',
 }
 
 export interface Employee {
@@ -35,6 +34,7 @@ export interface Candidate {
   avatar: string;
 }
 
+// FIX: Add ChatMessage type to fix import errors in services/geminiService.ts and components/AiAssistant.tsx
 export interface ChatMessage {
   role: 'user' | 'model';
   text: string;
